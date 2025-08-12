@@ -20,7 +20,7 @@ jobs:
           python-version: '3.x'
 
       - name: Run Python script and save to CSV
-        run: testing_time.py > output.csv
+        run: python testing_time.py > output.csv
 
       - name: Commit CSV to repo
         run: |
