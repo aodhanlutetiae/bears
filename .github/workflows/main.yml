@@ -1,44 +1,36 @@
-name: Run Python and Save Output
-
+name: Run time tester
 on:
-  workflow_dispatch:  # You can trigger manually from GitHub UI
-  schedule:
-    - cron: '0 0 12 * *'  # Midnight UTC on the 12th of every month
-    # - cron: '*/5 * * * *' # every 5 minutes
+    workflow_dispatch:
+    schedule:
+        #9:00am everyday
+        - cron: "0 9 * * *"
 
 jobs:
-  run-and-save:
-    runs-on: ubuntu-latest
+    Scrape:
+        #setting virtual env to the latest ver of Ubuntu
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      - name: Run Python script and save to CSV
-        run: python testing_time.py > output.csv
-
-      - name: Setup git for pushing
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git
-
-      - name: Commit and push CSV
-        run: |
-          git add output.csv
-          git commit -m "Update CSV with latest output" || echo "No changes to commit"
-          git push origin HEAD:${{ github.ref_name }}
-
-      # - name: Commit CSV to repo
-      #   run: |
-      #     git config --global user.name 'github-actions[bot]'
-      #     git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-      #     git add output.csv
-      #     git commit -m "Update CSV with latest output" || echo "No changes to commit"
-      #     git push
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+            
+            - name: Set up Python
+              uses: actions/setup-python@v2
+              with:
+                python-version: "3.9"
+        
+            #run the script
+            - name: Run scraping script
+              run: python testing_time.py
+                
+            - name: Add and commit
+              id: add_commit
+              uses: EndBug/add-and-commit@v8
+              with:
+                committer_name: Automated
+                committer_email: actions@users.noreply.github.com
+                message: "Latest data"
+            
+            - name: Push	
+              run: git push
 
