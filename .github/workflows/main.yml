@@ -3,8 +3,8 @@ name: Run Python and Save Output
 on:
   workflow_dispatch:  # You can trigger manually from GitHub UI
   schedule:
-    # - cron: '0 0 12 * *'  # Midnight UTC on the 12th of every month
-    - cron: '*/5 * * * *' # every 5 minutes
+    - cron: '0 0 12 * *'  # Midnight UTC on the 12th of every month
+    # - cron: '*/5 * * * *' # every 5 minutes
 
 jobs:
   run-and-save:
