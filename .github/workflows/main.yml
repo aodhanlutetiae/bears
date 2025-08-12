@@ -1,38 +1,33 @@
-name: Run scraper
+name: Run Python and Save Output
+
 on:
-    workflow_dispatch:
-    schedule:
-        #9:00am everyday
-        - cron: "0 9 * * *"
+  workflow_dispatch:  # You can trigger manually from GitHub UI
+  schedule:
+    # - cron: '0 0 12 * *'  # Midnight UTC on the 12th of every month
+    - cron: '*/5 * * * *' # every 5 minutes
 
 jobs:
-    Scrape:
-        #setting virtual env to the latest ver of Ubuntu
-        runs-on: ubuntu-latest
+  run-and-save:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v2
-            
-            - name: Set up Python
-              uses: actions/setup-python@v2
-              with:
-                python-version: "3.9"
-            
-            # - name: Install dependencies
-            #   run: pip install requests beautifulsoup4
-            
-            #run the script
-            - name: Run script
-              run: python testing_time.py
-                
-            - name: Add and commit
-              id: add_commit
-              uses: EndBug/add-and-commit@v8
-              with:
-                committer_name: Automated
-                committer_email: actions@users.noreply.github.com
-                message: "Latest data"
-            
-            - name: Push	
-              run: git push
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Run Python script and save to CSV
+        run: |
+          testing_time.py > output.csv
+
+      - name: Commit CSV to repo
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add output.csv
+          git commit -m "Update CSV with latest output" || echo "No changes to commit"
+          git push
+
